@@ -1,0 +1,5 @@
+emsIsOos
+isFirstStartupCycleExecuted,
+degradationStateMachine_phase
+skipHealingInFirstCycle,
+degradationStateMachine_timer

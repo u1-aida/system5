@@ -7,22 +7,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from asammdf import MDF
 
-import Lib.MdfExtractor as MdfExtractor
-import Lib.plot_3x2 as plot_3x2
-import Lib.plot_Auto as plot_Auto
-import BasicInputAnalyze.genericWSS_Report as genericWSS_Report
-import standstill.standstillReport as standstillReport
-import Lib.findProgram as findProgram
+import lib.mdfExtractor as MdfExtractor
+import lib.findProgram as findProgram
 
-import mal.malReport as malReport
-import mal.mal_HistReport as mal_HistReport
-import mal.mal_XCP_Report as mal_XCP_Report
-import mal.mal_FailCheck as mal_FailCheck
-import Ref.refReport as refReport
-import Develop.Test_Variance as testVariance
-import EmsOos.appendEmsOos as appendEmsOos
-import EmsOos.EmsOos_Report as EmsOos_Report
-import EMS.emsOffset as emsOffset
+import emsOos.appendEmsOos as appendEmsOos
+import emsOos.emsOos_Report as EmsOos_Report
 
 #   クラスの定義
 class Dat():
@@ -73,29 +62,10 @@ def aplicationProgram(args, mdf, Data, Report, Config):
   if(args.ProgramSet == "EMS_Oos"):
     appendEmsOos.generateDatData(mdf, Data.Data_m,Config)
     EmsOos_Report.EmsOosReport_main(Data, Config, Report)
-  if(args.ProgramSet == "MalAnalyze"):
-    Config.multiPlot = True
-    #malReport.malReport_main(Data, Config, Report)
-    mal_FailCheck.malReport_main(Data, Config, Report)
-  if(args.ProgramSet == "XCP_Test"):
-    mal_XCP_Report.malReport_main(Data, Config, Report)
-  if(args.ProgramSet == "MAL_Hist"):
-    Config.multiPlot = True
-    mal_HistReport.malReport_main(Data, Config, Report)
-  if(args.ProgramSet == "longReference"):
-    refReport.Report_main(Data, Config, Report)
-  if(args.ProgramSet == "testVariance"):
-    testVariance.testVariance_main(Data, Config, Report)
-  if(args.ProgramSet == "Standstill"):
-    standstillReport.standstillReport_main(Data, Config, Report)
-    standstillReport.reportMain(Data, Config, Report)  # レポートを生成
   if(args.ProgramSet == "EmsOos"):
     appendEmsOos.generateDatData(mdf, Data, Config)
   if(args.ProgramSet == "EmsOos"):
     appendEmsOos.generateDatData(mdf, Data, Config)
-  if(args.ProgramSet == "EmsOffset"):
-    emsOffset.emsOffset_main(Data, Config, Report)
-    Config.multiPlot = True
 
 def main(Data, Report, Config):
 
@@ -141,11 +111,7 @@ def main(Data, Report, Config):
       getMdfData(mdf, Data.Data_s, Config)
       aplicationProgram(args, mdf, Data, Report, Config)
       print(f"Processed file: {mf4_File}")
-
-    if(Config.multiPlot == True):
-      mal_HistReport.plot_Hist_Relative(Data, Config, local, Report)
-      print(f"Total files processed: {len(mf4_file_list)}")
-      
+     
   else:
     mf4_File = os.path.normpath(Config.mf4_file)  # パスの正規化
     mdf = MDF(mf4_File)

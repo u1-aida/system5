@@ -1,0 +1,6 @@
+ShortName,OriginalName,Normalization
+emsIsOos,     g_ARM_Per_Arm_Per_arm_EmsRunnable.m_state.stateMachines.degradationStateMachine.emsIsOos
+isFirstStartupCycleExecuted,     g_ARM_Per_Arm_Per_arm_EmsRunnable.m_state.stateMachines.degradationStateMachine.isFirstStartupCycleExecuted
+degradationStateMachine_phase,     g_ARM_Per_Arm_Per_arm_EmsRunnable.m_state.stateMachines.degradationStateMachine.phase
+skipHealingInFirstCycle,     g_ARM_Per_Arm_Per_arm_EmsRunnable.m_state.stateMachines.degradationStateMachine.skipHealingInFirstCycle
+degradationStateMachine_timer,     g_ARM_Per_Arm_Per_arm_EmsRunnable.m_state.stateMachines.degradationStateMachine.timer.m_value

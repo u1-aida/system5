@@ -11,6 +11,22 @@
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal"
+    },
+    {
+      "name": "Python Debugger: EMS OOS",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "args": 
+      [
+        "--ProgramSet", "EMS_Oos",
+        "--DataDict", "signalDataBase_EmsOos_s.csv",
+        "--DataList", "signalDataList_EmsOos_s.csv",
+        "--SourceList", "RadarRL",
+        "--MF4_List", "/Users/u1_aida/Dev_Data/Tool_Dev/Oos_Test_RL"
+    ]      
     }
+
   ]
 }

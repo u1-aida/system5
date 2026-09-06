@@ -1,0 +1,4 @@
+ShortName,OriginalName_1,OriginalName_2,Normalization
+EmsStateMachines_ssmPhase,        g_ARM_Per_Arm_Per_arm_EmsRunnable.m_state.stateMachines.signalStateArray.m_value, ssmPhase
+EmsStateMachines_debouncingTimer, g_ARM_Per_Arm_Per_arm_EmsRunnable.m_state.stateMachines.signalStateArray.m_value, debouncingTimer.m_value
+EmsStateMachines_signalIsInvalid, g_ARM_Per_Arm_Per_arm_EmsRunnable.m_state.stateMachines.signalStateArray.m_value, signalIsInvalid.m_storage.arr
