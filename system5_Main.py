@@ -25,13 +25,25 @@ class DataClass():
 Data = Dat()
 Data.Data_s = Dat()
 Data.Data_m = Dat()
+
 Config = Dat()
+# mf4_file_list: MF4ファイルのリスト
+# lenSourceList: sourceListの長さ
+# execute_path: スクリプトの実行パス
+# parent_path: 親ディレクトリのパス
+# pathName: カレントディレクトリのパス
+# template_path: テンプレートのパス
+# dataBase_full_path: データベースのフルパス
+# dataList_full_path: データリストのフルパス
+# sourceData_Type: データの種類（Simulation / Original）
+# Data_Dict: データ辞書のパス
+# Data_ListName: データリストのパス
+# sourceList: ソースチャンネルのリスト
+# mf4_file: MF4ファイルのパス
+
 Report = Dat()
-#Report.report_s = Dat()
-#Report.report_m = Dat()
 
 def preProc(Data, Config):
-  Config.multiPlot = False
   Config.mf4_file_list = []
   Config.lenSourceList = len(Config.sourceList)
   Config.execute_path = os.path.dirname(os.path.abspath(__file__))                            # スクリプトの実行パスを取得
@@ -45,12 +57,6 @@ def preProc(Data, Config):
 
   with open(Config.dataList_full_path, "r", encoding="utf-8") as f:
     Config.DataList.list_S = [line.strip() for line in f if line.strip()]
-
-  #if (Config.singleMode == False):
-  #  mf4_folder = os.path.normpath(mf4_folder)  # パスの正規化
-  #  Config.mf4_file_list = glob.glob(os.path.join(Config.mf4_folder, "*.mf4")) + glob.glob(os.path.join(mf4_folder, "*.MF4"))
-  #else:
-  #  Config.mf4_file_list.append(os.path.normpath(Config.mf4_file))  # 単一ファイルモードの場合、指定されたファイルをリストに追加
 
 def getMdfData(mdf, Data, Config):
   # Single（構造体データでない）データの読み込み
@@ -77,7 +83,7 @@ def main(Data, Report, Config):
   parser.add_argument("--MF4_List", help="List of MF4 files to process")
   args = parser.parse_args()
 
-  Config.sourceData_Type = "Original"        #[Selena / Original]
+  Config.sourceData_Type = "Original"        #[Simulation / Original]
   Config.Data_Dict = args.DataDict
   Config.Data_ListName = args.DataList
   Config.DataList = Dat()
