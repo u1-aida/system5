@@ -48,10 +48,10 @@ def emsOosPlot_1 (Report, idxNum, idxSource, posBegin, posEnd):
   fig_0.plot(Report.dataTime[0][0][idxSource][idxNum][posBegin:posEnd], Report.dataValue[0][0][idxSource][idxNum][posBegin:posEnd])
   fig_0.plot(Report.dataTime[0][1][idxSource][posBegin:posEnd], Report.dataValue[0][1][idxSource][posBegin:posEnd])
   #fig_0.set_title(f"Phase: {Report.dataValue[0][0][idxSource][idxNum][posBegin:posEnd]}")
-  fig_0.set_title(f"Phase:")
+  fig_0.set_title(Report.evaluationItem[0])
   fig_1.plot(Report.dataTime[1][0][idxSource][idxNum][posBegin:posEnd], Report.dataValue[1][0][idxSource][idxNum][posBegin:posEnd])
   #fig_1.set_title(f"Debouncing Timer: {Report.dataValue[1][0][idxSource][idxNum][posBegin:posEnd]}")
-  fig_1.set_title(f"Debouncing Timer:")
+  fig_1.set_title(Report.evaluationItem[1])
   plt.tight_layout()
   plt.show()
   return figure
@@ -64,29 +64,35 @@ def EmsOosReport_main(Data, Config, Report):
 
   Report.reportName = "EMS_OOS_Report"
 
-  Report.Evaluation_List = ["MAL_Elevation", "MAL_Azimuth"]
-  Report.titleList = ["Elevation", "Azimuth"]
+  Report.evaluationItem = ["EmsOos_State", "Ems_DebounceTimer"]
 
-  Report.plotList = np.empty((len(Report.Evaluation_List)), dtype=object)
+  Report.plotList = np.empty((len(Report.evaluationItem)), dtype=object)
 
   Report.plotList[0]=(["EmsStateMachines_ssmPhase", "emsIsOos"])
   Report.plotList[1]=(["EmsStateMachines_debouncingTimer"])
   Report.plotUnit = (["-", "-"])
 
   Report.lenPlotList = len(Report.plotList)
-  Report.lenEvaluationList = len(Report.Evaluation_List)
+  Report.lenEvaluationList = len(Report.evaluationItem)
   Report.evalResult = np.empty((Report.lenEvaluationList), dtype=object)
   Report.lenTotalData = np.empty(Report.lenPlotList)
   #ocalSetup.LocalSetup(Config, local, Report)
   idx1 = 0
   idx2 = 32
   Report.stateChangeInvalid = np.empty(idx2, dtype=object)
+  Report.stateChangeHealed = np.empty(idx2, dtype=object)
   preProc.preProc_Common(Data, Config, Report, idx1, idx2)
+  Report.emsOosInvalid = findProgram.findChangePoint(Report.dataValue[0][1][0], 1)
+  Report.emsOosHealed  = findProgram.findChangePoint(Report.dataValue[0][1][0], 0)
+
+  print(Report.emsOosInvalid)
   for idxNum in range (idx1,idx2):
     Report.stateChangeInvalid[idxNum] = np.empty(len(Config.sourceList), dtype=object)
+    Report.stateChangeHealed[idxNum] = np.empty(len(Config.sourceList), dtype=object)
 
   for idxNum in range(idx1, idx2):
     for idxSource in range(len(Config.sourceList)):
       Report.stateChangeInvalid[idxNum][idxSource] = findProgram.findChangePoint(Report.dataValue[0][0][idxSource][idxNum], "invalid")
+      Report.stateChangeHealed[idxNum][idxSource] = findProgram.findChangePoint(Report.dataValue[0][0][idxSource][idxNum], "valid")
       if(len(Report.stateChangeInvalid[idxNum][idxSource]) > 0):
         emsOosPlot_PreProc(Report, idxNum, idxSource)

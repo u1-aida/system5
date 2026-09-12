@@ -44,23 +44,25 @@ Config = Dat()
 Report = Dat()
 
 def configSetup(Config):
+  #
   Config.sourceData_Type  = "Original"        #[Simulation / Original]
   Config.mf4_file         = "/Users/u1_aida/Dev_Data/Tool_Dev/Oos_Test_RL"
   Config.Data_Dict        = "signalDataBase_EmsOos_s.csv"
   Config.Data_ListName    = "signalDataList_EmsOos_s.csv"
   Config.sourceList      = ["RadarRL"]
-  Config.template_path = os.path.join(Config.execute_path, "template")                            # 親ディレクトリのWorkフォルダを指定
-  Config.lenSourceList = len(Config.sourceList)
+  #
 
   Config.dataBase_full_path = os.path.join(Config.execute_path, 'dataBase', Config.Data_Dict)
   Config.dataList_full_path = os.path.join(Config.execute_path, 'dataList', Config.Data_ListName)
-
+  Config.template_path = os.path.join(Config.execute_path, "template")                            # 親ディレクトリのWorkフォルダを指定
   Config.signalDataBaseList = pd.read_csv(Config.dataBase_full_path)
+  Config.lenSourceList = len(Config.sourceList)
+
 
   with open(Config.dataList_full_path, "r", encoding="utf-8") as f:
     Config.DataList.list_S = [line.strip() for line in f if line.strip()]
 
-def preProc(Data, Config):
+def preProc(Config):
   Config.mf4_file_list = []
   Config.execute_path = os.path.dirname(os.path.abspath(__file__))                            # スクリプトの実行パスを取得
   Config.parent_path = os.path.dirname(Config.execute_path)                                   # 親ディレクトリのパスを取得
@@ -85,7 +87,7 @@ def main(Data, Report, Config):
   Data.dataValue = []
   Data.dataTime = []
 
-  preProc(Data, Config)
+  preProc(Config)
   configSetup(Config)
 
   if Config.mf4_file and os.path.isdir(Config.mf4_file):
@@ -118,7 +120,7 @@ def main(Data, Report, Config):
 
     local = Dat()
     getMdfData(mdf, Data, Config)
-    aplicationProgram(args, mdf, Data, Report, Config)
+    aplicationProgram(mdf, Data, Report, Config)
 
 if __name__ == '__main__':
   main(Data, Report, Config)
