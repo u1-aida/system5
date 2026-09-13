@@ -87,6 +87,10 @@ def main(Data, Report, Config):
   Data.dataValue = []
   Data.dataTime = []
 
+  Report.plotNum = 1
+  Report.csv_paths = []
+  Report.png_paths = []
+
   preProc(Config)
   configSetup(Config)
 

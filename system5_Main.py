@@ -101,6 +101,10 @@ def main(Data, Report, Config):
   Data.dataValue = []
   Data.dataTime = []
 
+  Report.plotNum = 1
+  Report.csv_paths = []
+  Report.png_paths = []
+
   if(Config.singleMode == False):
     # 複数ファイル（指定フォルダ内の一処理）モード
     mf4_folder = os.path.normpath(Config.mf4_file)  # パスの正規化

@@ -57,26 +57,19 @@ def emsOosPlot_1 (Report, idxNum, idxSource, posBegin, posEnd):
   return figure
 
 def EmsOosReport_main(Data, Config, Report):
-  local = Dat()
-  Report.plotNum = 1
-  Report.csv_paths = []
-  Report.png_paths = []
 
   Report.reportName = "EMS_OOS_Report"
 
+  # 各グラフに表示するタイトルの設定（この設定が配列の次元数１を決定する）
   Report.evaluationItem = ["EmsOos_State", "Ems_DebounceTimer"]
 
   Report.plotList = np.empty((len(Report.evaluationItem)), dtype=object)
 
+  # 各グラフに表示する信号のリストを設定（この設定が配列の次元数２を決定する）
   Report.plotList[0]=(["EmsStateMachines_ssmPhase", "emsIsOos"])
   Report.plotList[1]=(["EmsStateMachines_debouncingTimer"])
   Report.plotUnit = (["-", "-"])
 
-  Report.lenPlotList = len(Report.plotList)
-  Report.lenEvaluationList = len(Report.evaluationItem)
-  Report.evalResult = np.empty((Report.lenEvaluationList), dtype=object)
-  Report.lenTotalData = np.empty(Report.lenPlotList)
-  #ocalSetup.LocalSetup(Config, local, Report)
   idx1 = 0
   idx2 = 32
   Report.stateChangeInvalid = np.empty(idx2, dtype=object)
