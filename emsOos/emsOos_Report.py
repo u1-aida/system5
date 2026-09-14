@@ -21,8 +21,8 @@ class DataClass():
     self.value = ""
     self.time = ""
 
-def emsOosPlot_PreProc(Report, idxNum, idxSource):
-  lenData = len(Report.stateChangeInvalid[idxNum][idxSource])
+def emsOosPlot_PreProc(Report, targetList, idxNum, idxSource):
+  lenData = len(targetList)
   for idx in range(lenData):
     pos = Report.stateChangeInvalid[idxNum][idxSource][idx]
     posBegin = max(0, pos - 10)
@@ -47,11 +47,13 @@ def emsOosPlot_1 (Report, idxNum, idxSource, posBegin, posEnd):
   fig_0, fig_1 = axes
   fig_0.plot(Report.dataTime[0][0][idxSource][idxNum][posBegin:posEnd], Report.dataValue[0][0][idxSource][idxNum][posBegin:posEnd])
   fig_0.plot(Report.dataTime[0][1][idxSource][posBegin:posEnd], Report.dataValue[0][1][idxSource][posBegin:posEnd])
+  fig_0.legend(Report.plotList[0])
   #fig_0.set_title(f"Phase: {Report.dataValue[0][0][idxSource][idxNum][posBegin:posEnd]}")
-  fig_0.set_title(Report.evaluationItem[0])
+  fig_0.set_title(f"{Report.evaluationItem[0]}, ID = {idxNum}", fontsize=12)
   fig_1.plot(Report.dataTime[1][0][idxSource][idxNum][posBegin:posEnd], Report.dataValue[1][0][idxSource][idxNum][posBegin:posEnd])
+  fig_1.legend(Report.plotList[1])
   #fig_1.set_title(f"Debouncing Timer: {Report.dataValue[1][0][idxSource][idxNum][posBegin:posEnd]}")
-  fig_1.set_title(Report.evaluationItem[1])
+  fig_1.set_title(Report.evaluationItem[1], fontsize=12)
   plt.tight_layout()
   plt.show()
   return figure
@@ -87,5 +89,17 @@ def EmsOosReport_main(Data, Config, Report):
     for idxSource in range(len(Config.sourceList)):
       Report.stateChangeInvalid[idxNum][idxSource] = findProgram.findChangePoint(Report.dataValue[0][0][idxSource][idxNum], "invalid")
       Report.stateChangeHealed[idxNum][idxSource] = findProgram.findChangePoint(Report.dataValue[0][0][idxSource][idxNum], "valid")
-      if(len(Report.stateChangeInvalid[idxNum][idxSource]) > 0):
-        emsOosPlot_PreProc(Report, idxNum, idxSource)
+      #if(len(Report.stateChangeInvalid[idxNum][idxSource]) > 0):
+        #emsOosPlot_PreProc(Report, idxNum, idxSource)
+
+  for idxNum in range(idx1, idx2):
+    for idxSource in range(len(Config.sourceList)):
+      matchIdList = [
+        idx for idx in Report.stateChangeInvalid[idxNum][idxSource]
+        if idx in Report.emsOosInvalid
+      ]
+    if (len(matchIdList) > 0):
+      debug = Report.stateChangeInvalid[idxNum][idxSource]
+      emsOosPlot_PreProc(Report, matchIdList, idxNum, idxSource)
+      
+
