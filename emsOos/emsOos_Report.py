@@ -21,15 +21,16 @@ class DataClass():
     self.value = ""
     self.time = ""
 
-def emsOosPlot_PreProc(Report, targetList, idxNum, idxSource):
+def emsOosPlot_PreProc(Report, targetList, targetData, idxNum, idxSource):
+  Report.plotNum = 1
   lenData = len(targetList)
   for idx in range(lenData):
-    pos = Report.stateChangeInvalid[idxNum][idxSource][idx]
+    pos = targetData[idx]
     posBegin = max(0, pos - 10)
     posEnd = min(len(Report.dataValue[0][0][idxSource][idxNum]) - 1, pos + 10)
-    emsOosPlot_1(Report, idxNum, idxSource, posBegin, posEnd)
+    emsOosPlot(Report, idxNum, idxSource, posBegin, posEnd)
 
-def emsOosPlot_1 (Report, idxNum, idxSource, posBegin, posEnd):
+def emsOosPlot (Report, idxNum, idxSource, posBegin, posEnd):
   figure = plt.figure(figsize=(16, 9))
   numPlotCol = 1
   numPlotRow = 2
@@ -48,14 +49,16 @@ def emsOosPlot_1 (Report, idxNum, idxSource, posBegin, posEnd):
   fig_0.plot(Report.dataTime[0][0][idxSource][idxNum][posBegin:posEnd], Report.dataValue[0][0][idxSource][idxNum][posBegin:posEnd])
   fig_0.plot(Report.dataTime[0][1][idxSource][posBegin:posEnd], Report.dataValue[0][1][idxSource][posBegin:posEnd])
   fig_0.legend(Report.plotList[0])
-  #fig_0.set_title(f"Phase: {Report.dataValue[0][0][idxSource][idxNum][posBegin:posEnd]}")
   fig_0.set_title(f"{Report.evaluationItem[0]}, ID = {idxNum}", fontsize=12)
+
   fig_1.plot(Report.dataTime[1][0][idxSource][idxNum][posBegin:posEnd], Report.dataValue[1][0][idxSource][idxNum][posBegin:posEnd])
   fig_1.legend(Report.plotList[1])
-  #fig_1.set_title(f"Debouncing Timer: {Report.dataValue[1][0][idxSource][idxNum][posBegin:posEnd]}")
   fig_1.set_title(Report.evaluationItem[1], fontsize=12)
   plt.tight_layout()
-  plt.show()
+  png_filename = (f"{Report.evaluationItem[0]}_ID={idxNum}_{Report.plotNum}.png")
+  plt.savefig(os.path.join(Report.png_path, png_filename))
+  Report.png_paths.append(os.path.join(Report.png_path, png_filename))
+  Report.plotNum += 1
   return figure
 
 def EmsOosReport_main(Data, Config, Report):
@@ -65,41 +68,67 @@ def EmsOosReport_main(Data, Config, Report):
   # 各グラフに表示するタイトルの設定（この設定が配列の次元数１を決定する）
   Report.evaluationItem = ["EmsOos_State", "Ems_DebounceTimer"]
 
+  # 各グラフに表示する信号のリストを設定（この設定が配列の次元数２を決定する） 
   Report.plotList = np.empty((len(Report.evaluationItem)), dtype=object)
 
   # 各グラフに表示する信号のリストを設定（この設定が配列の次元数２を決定する）
   Report.plotList[0]=(["EmsStateMachines_ssmPhase", "emsIsOos"])
   Report.plotList[1]=(["EmsStateMachines_debouncingTimer"])
+  # 各グラフに表示する信号の単位を設定（この設定が配列の次元数２を決定する）
   Report.plotUnit = (["-", "-"])
+
+  #  Reportを出力するフォルダーを設定(PNG)
+  Report.reportPath = os.path.join(Config.execute_path, "report")
+  Report.png_path = os.path.join(Report.reportPath, "png")
+  os.makedirs(Report.reportPath, exist_ok=True)
+  os.makedirs(Report.png_path, exist_ok=True)
 
   idx1 = 0
   idx2 = 32
   Report.stateChangeInvalid = np.empty(idx2, dtype=object)
   Report.stateChangeHealed = np.empty(idx2, dtype=object)
+  Report.stateChangeList = np.empty(idx2, dtype=object)
   preProc.preProc_Common(Data, Config, Report, idx1, idx2)
+
+  #  配列[0][1][0]が1へ変化した時のインデックスを取得
   Report.emsOosInvalid = findProgram.findChangePoint(Report.dataValue[0][1][0], 1)
+
+  #  配列[0][1][0]が0へ変化した時のインデックスを取得
   Report.emsOosHealed  = findProgram.findChangePoint(Report.dataValue[0][1][0], 0)
 
-  print(Report.emsOosInvalid)
+  #  構造体データの各IDに対して、配列[0][0][idxSource][idxNum]が変化した詩のインデックスを取得するため配列を確保
   for idxNum in range (idx1,idx2):
     Report.stateChangeInvalid[idxNum] = np.empty(len(Config.sourceList), dtype=object)
     Report.stateChangeHealed[idxNum] = np.empty(len(Config.sourceList), dtype=object)
+    Report.stateChangeList[idxNum] = np.empty(len(Config.sourceList), dtype=object)
 
+
+  # 構造体データの各IDに対して、配列[0][0][idxSource][idxNum]が変化した詩のインデックスを取得する 
   for idxNum in range(idx1, idx2):
     for idxSource in range(len(Config.sourceList)):
       Report.stateChangeInvalid[idxNum][idxSource] = findProgram.findChangePoint(Report.dataValue[0][0][idxSource][idxNum], "invalid")
       Report.stateChangeHealed[idxNum][idxSource] = findProgram.findChangePoint(Report.dataValue[0][0][idxSource][idxNum], "valid")
-      #if(len(Report.stateChangeInvalid[idxNum][idxSource]) > 0):
-        #emsOosPlot_PreProc(Report, idxNum, idxSource)
+      Report.stateChangeList[idxNum][idxSource] = Report.stateChangeInvalid[idxNum][idxSource] + Report.stateChangeHealed[idxNum][idxSource]
+      debug1 = Report.stateChangeInvalid[idxNum][idxSource]
+      debug2 = Report.stateChangeHealed[idxNum][idxSource]
+      debug3 = Report.stateChangeList[idxNum][idxSource]
 
-  for idxNum in range(idx1, idx2):
-    for idxSource in range(len(Config.sourceList)):
-      matchIdList = [
-        idx for idx in Report.stateChangeInvalid[idxNum][idxSource]
-        if idx in Report.emsOosInvalid
+      #  stateChangeInvalidとemsOosInvalidの両方に含まれるインデックスを取得し、共通するインデックスが存在する場合emsOosPlot_PreProc関数を呼び出す
+      matchIdList_1 = [
+          idx for idx in Report.stateChangeInvalid[idxNum][idxSource]
+          if idx in Report.emsOosInvalid
+        #or
+        #(
+        #)
       ]
+      matchIdList_2 = [
+          idx for idx in Report.stateChangeHealed[idxNum][idxSource]
+          if idx in Report.emsOosHealed
+
+      ]
+      matchIdList = matchIdList_1 + matchIdList_2
+
+    debug = len(matchIdList)
     if (len(matchIdList) > 0):
-      debug = Report.stateChangeInvalid[idxNum][idxSource]
-      emsOosPlot_PreProc(Report, matchIdList, idxNum, idxSource)
-      
+      emsOosPlot_PreProc(Report, matchIdList, Report.stateChangeList[idxNum][idxSource], idxNum, idxSource)
 
