@@ -119,10 +119,13 @@ def EmsOosReport_main(Data, Config, Report):
       Report.stateChangeList[idxNum][idxSource] = Report.stateChangeInvalid[idxNum][idxSource] + Report.stateChangeHealed[idxNum][idxSource]
 
       #  stateChangeInvalidとemsOosInvalidの両方に含まれるインデックスを取得し、共通するインデックスが存在する場合emsOosPlot_PreProc関数を呼び出す
+      # Oosセットと同時にStatusが切り替わった場合のインデックスを取得し、共通するインデックスが存在する場合
       matchIdList_1 = [
           idx for idx in Report.stateChangeInvalid[idxNum][idxSource]
           if idx in Report.emsOosInvalid
       ]
+
+      # Oosリセットと同時にStatusが切り替わった場合のインデックスを取得し、共通するインデックスが存在する場合
       matchIdList_2 = [
           idx for idx in Report.stateChangeHealed[idxNum][idxSource]
           if idx in Report.emsOosHealed
@@ -130,6 +133,7 @@ def EmsOosReport_main(Data, Config, Report):
       ]
       matchIdList = matchIdList_1 + matchIdList_2
 
+      # Set / Resetいずれかの条件とインデックスが一致する場合に、emsOosPlot_PreProc関数を呼び出す
       lenList = len(matchIdList)
       for idx in range(lenList):
         emsOosPlot_PreProc(Report, matchIdList, Report.stateChangeList[idxNum][idxSource], idxNum, idxSource)
