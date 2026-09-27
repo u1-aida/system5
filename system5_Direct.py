@@ -10,8 +10,7 @@ from asammdf import MDF
 import lib.mdfExtractor as MdfExtractor
 import lib.findProgram as findProgram
 
-import emsOos.appendEmsOos as appendEmsOos
-import emsOos.emsOos_Report as EmsOos_Report
+import applicationSelector as applicationSelector
 
 #   クラスの定義
 class Dat():
@@ -74,10 +73,6 @@ def getMdfData(mdf, Data, Config):
     for Config.sourceChannel in Config.sourceList:
       Data = MdfExtractor.get_Data(mdf, Data, Config, tarData)  # Radarのデータを取得
 
-def aplicationProgram(mdf, Data, Report, Config):
-  appendEmsOos.generateDatData(mdf, Data.Data_m,Config)
-  EmsOos_Report.EmsOosReport_main(Data, Config, Report)
-
 def main(Data, Report, Config):
 
   Config.sourceData_Type = "Original"        #[Simulation / Original]
@@ -114,7 +109,7 @@ def main(Data, Report, Config):
       # Single（構造体データでない）データをData.Data_sに格納
       # Multi（構造体データ）データの場合は、各実行ファンクションで適宜Data.Data_mに格納すること
       getMdfData(mdf, Data.Data_s, Config)
-      aplicationProgram(mdf, Data, Report, Config)
+      applicationSelector.aplicationProgram(mdf, Data, Report, Config)
       print(f"Processed file: {mf4_File}")
      
   else:
@@ -124,7 +119,7 @@ def main(Data, Report, Config):
 
     local = Dat()
     getMdfData(mdf, Data, Config)
-    aplicationProgram(mdf, Data, Report, Config)
+    applicationSelector.aplicationProgram(mdf, Data, Report, Config)
 
 if __name__ == '__main__':
   main(Data, Report, Config)
