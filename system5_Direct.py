@@ -43,13 +43,6 @@ Config = Dat()
 Report = Dat()
 
 def configSetup(Config):
-  #
-  Config.sourceData_Type  = "Original"        #[Simulation / Original]
-  Config.mf4_file         = "/Users/u1_aida/Dev_Data/Tool_Dev/Oos_Test_RL"
-  Config.Data_Dict        = "signalDataBase_EmsOos_s.csv"
-  Config.Data_ListName    = "signalDataList_EmsOos_s.csv"
-  Config.sourceList      = ["RadarRL"]
-  #
 
   Config.dataBase_full_path = os.path.join(Config.execute_path, 'dataBase', Config.Data_Dict)
   Config.dataList_full_path = os.path.join(Config.execute_path, 'dataList', Config.Data_ListName)
@@ -87,6 +80,7 @@ def main(Data, Report, Config):
   Report.png_paths = []
 
   preProc(Config)
+  applicationSelector.setAplicationProgram(Data, Report, Config)
   configSetup(Config)
 
   if Config.mf4_file and os.path.isdir(Config.mf4_file):
@@ -109,7 +103,7 @@ def main(Data, Report, Config):
       # Single（構造体データでない）データをData.Data_sに格納
       # Multi（構造体データ）データの場合は、各実行ファンクションで適宜Data.Data_mに格納すること
       getMdfData(mdf, Data.Data_s, Config)
-      applicationSelector.aplicationProgram(mdf, Data, Report, Config)
+      applicationSelector.execAplicationProgram(mdf, Data, Report, Config)
       print(f"Processed file: {mf4_File}")
      
   else:
@@ -119,7 +113,8 @@ def main(Data, Report, Config):
 
     local = Dat()
     getMdfData(mdf, Data, Config)
-    applicationSelector.aplicationProgram(mdf, Data, Report, Config)
+    applicationSelector.execAplicationProgram(mdf, Data, Report, Config)
 
 if __name__ == '__main__':
   main(Data, Report, Config)
+
