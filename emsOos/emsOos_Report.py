@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 mpl.style.use('ggplot')
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 
-import lib.localSetup as localSetup
 import lib.preProc as preProc
 import lib.findProgram as findProgram
 

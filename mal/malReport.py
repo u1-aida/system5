@@ -8,9 +8,8 @@ import matplotlib.pyplot as plt
 mpl.style.use('ggplot')
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 
-import Lib.localSetup as localSetup
-import Lib.docProgram as docProgram
-import Lib.preProc as preProc
+#import Lib.docProgram as docProgram
+import lib.preProc as preProc
 
 #   クラスの定義
 class Dat():
@@ -22,7 +21,7 @@ class DataClass():
     self.time = ""
 
 
-def dataPlot_Elevation(Data, Config, local, report):
+def dataPlot_Elevation(Data, Config, report):
   for idxSource in range(Config.lenSourceList):
     #figure = plt.figure(figsize=(16, 12))
     figure = plt.figure(figsize=(20, 12))
@@ -90,12 +89,12 @@ def dataPlot_Elevation(Data, Config, local, report):
     else:
       png_filename = f'{Config.mf4_file_name}.png'
 
-    plt.savefig(os.path.join(local.png_path, png_filename))
-    report.png_paths.append(os.path.join(local.png_path, png_filename))
+    plt.savefig(os.path.join(report.png_path, png_filename))
+    report.png_paths.append(os.path.join(report.png_path, png_filename))
     report.plotNum += 1
     plt.close()
 
-def plot_All(Data, Config, local,report):
+def plot_All(Data, Config, report):
   for idxSource in range(Config.lenSourceList):
     #figure = plt.figure(figsize=(16, 12))
     figure = plt.figure(figsize=(22, 5))
@@ -112,11 +111,6 @@ def plot_All(Data, Config, local,report):
       if len(axes) >= lenData:
         break
 
-    fig_0, fig_1 = axes
-    #try:
-    #  figure.suptitle(f"{report.reportName}_{Config.sourceList[idxSource]}", fontsize=14)
-    #except Exception:
-    #  pass
     plotNum = 0
     for idxPlot in range(report.lenPlotList):
       tarFig = eval(f'fig_{plotNum}')
@@ -158,8 +152,8 @@ def plot_All(Data, Config, local,report):
       plotNum += 1
 
     png_filename = f'{report.reportName}_{Config.sourceList[idxSource]}.png'
-    plt.savefig(os.path.join(local.multiPlot_png_path, png_filename))
-    report.png_paths.append(os.path.join(local.multiPlot_png_path, png_filename))
+    plt.savefig(os.path.join(report.multiPlot_png_path, png_filename))
+    report.png_paths.append(os.path.join(report.multiPlot_png_path, png_filename))
     report.plotNum += 1
     plt.close()
 
@@ -172,35 +166,39 @@ def postProc(Data, Config, report):
           report.dataValue[idxPlot][idxData][idxSource] = np.array(val) * 180.0 / np.pi  # ラジアンを度に変換
 
 def malReport_main(Data, Config, Report):
-  local = Dat()
   Report.plotNum = 1
-  Report.csv_paths = []
-  Report.png_paths = []
 
-  Report.reportName = "MAL_el_Report"
+  #Report.reportName = "MAL_el_Report"
+
+  # 各グラフに表示するタイトルの設定（この設定が配列の次元数１を決定する）
+  Report.evaluationItem = ["EmsOos_State", "Ems_ssmPhase", "Ems_DebouncingTimer"]
 
   Report.Evaluation_List = ["MAL_el_Indicator", "Vehicle Speed"]
   Report.titleList = ["Indicator", "Vehicle Speed"]
 
+
+  # 各グラフに表示する信号のリストを設定（この設定が配列の次元数２を決定する） 
   Report.plotList = np.empty((len(Report.Evaluation_List)), dtype=object)
 
-  #Report.plotList[0]=(["MAL_elOOS_outOfSpecCause"])
-  #Report.plotList[1]=(["MAL_elOOS_stablePosition", "MAL_elComp_estimation", "MAL_elComp_meanVal"])
   Report.plotList[0]=(["MAL_elOOS_stablePosition", "MAL_AngleIndicator_el", "MAL_AngleIndicator_elMean"])
   Report.plotList[1] =(["EgoStateOut_vxVehRef"])
-  #Report.plotList[4] =(["EgoStateOut_yawRate"])
   Report.plotUnit = (["deg","m/s"])
 
   Report.lenPlotList = len(Report.plotList)
 
+  #  Reportを出力するフォルダーを設定(PNG)
+  Report.reportPath = os.path.join(Config.execute_path, "report")
+  Report.png_path = os.path.join(Report.reportPath, "png")
+  os.makedirs(Report.reportPath, exist_ok=True)
+  os.makedirs(Report.png_path, exist_ok=True)
+
 
   Report.lenEvaluationList = len(Report.Evaluation_List)
   Report.evalResult = np.empty((Report.lenEvaluationList), dtype=object)
-  localSetup.LocalSetup(Config, local, Report)
-  preProc.preProc_Single(Data, Config, Report)
+  preProc.preProc_Common(Data, Config, Report, 0, 1)
   postProc(Data, Config, Report)
-  preProc.preProc_Append(Data, Config, Report)
-  dataPlot_Elevation(Data, Config, local, Report)
+  #preProc.preProc_Append(Data, Config, Report)
+  dataPlot_Elevation(Data, Config, Report)
   if (Config.multiPlot == True):
-    plot_All(Data, Config, local, Report)
+    plot_All(Data, Config, Report)
   print("malReport_main finished")

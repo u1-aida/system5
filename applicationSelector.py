@@ -1,5 +1,6 @@
 
 executionTarget = "EmsOos"
+#executionTarget = "Mal"
 import textwrap
 
 def setAplicationProgram(Data, Report, Config):
@@ -25,7 +26,24 @@ def EmsOos(Data, Report, Config):
   EmsOos_Report.EmsOosReport_main(Data, Config, Report)
   """
   Config.codeString = textwrap.dedent(codeString)
- 
+
+def Mal(Data, Report, Config):
+
+  Config.sourceData_Type  = "Original"        #[Simulation / Original]
+  Config.mf4_file         = "/Users/u1_aida/Dev_Data/Tool_Dev/MAL_Dev"
+  Config.Data_Dict        = "MalDatabase.csv"
+  Config.Data_ListName    = "signalDataList_MAL.csv"
+  Config.sourceList      = ["RadarFC"]
+  Config.multiPlot = False
+
+  Report.reportName = "MAL_el_Report"
+
+  codeString = """
+  import mal.malReport as malReport
+  malReport.malReport_main(Data, Config, Report)
+  """
+  Config.codeString = textwrap.dedent(codeString)
+
 def main(mdf, Data, Report, Config):
   import system5_Direct as system5_Direct
   system5_Direct.main(Data, Report, Config)
